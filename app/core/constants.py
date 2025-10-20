@@ -1,0 +1,12 @@
+BASE_FARE = 35000
+TIME_RATE = 2500
+DISTANCE_RATE = 6000
+MAX_SURGE_MULTIPLIER = 2.5
+
+WEATHER_FACTORS = {"clear": 0.5, "rainy": 0.2, "snowy": 0.5}
+
+TRAFFIC_FACTORS = {"normal": 0, "light": 0.2, "moderate": 0.4, "heavy": 0.5}
+
+NIGHT_TIME_START = 0
+NIGHT_TIME_END = 6
+NIGHT_TIME_FACTOR = 0.2
