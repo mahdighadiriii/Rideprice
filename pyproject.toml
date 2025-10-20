@@ -9,6 +9,13 @@ readme = "README.md"
 [tool.poetry.dependencies]
 python = "^3.12"
 fastapi = {extras = ["standard"], version = "^0.119.1"}
+uvicorn = {extras = ["standard"], version = "^0.38.0"}
+pydantic-settings = "^2.11.0"
+python-dotenv = "^1.1.1"
+httpx = "^0.28.1"
+python-multipart = "^0.0.20"
+pytest = "^8.4.2"
+pytest-asyncio = "^1.2.0"
 
 
 [build-system]
