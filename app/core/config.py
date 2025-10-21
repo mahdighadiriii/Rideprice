@@ -5,7 +5,6 @@ class Settings(BaseSettings):
     APP_NAME: str = "RidePrice Service"
     APP_VERSION: str = "1.0.0"
     DEBUG: bool = False
-
     BASE_FARE: int = 35000
     TIME_RATE: int = 2500
     DISTANCE_RATE: int = 6000
@@ -13,6 +12,9 @@ class Settings(BaseSettings):
 
     NESHAN_API_KEY: str = ""
     NESHAN_BASE_URL: str = "https://api.neshan.org/v4"
+
+    GOOGLE_MAPS_API_KEY: str = ""
+
     OPENWEATHER_API_KEY: str = ""
 
     class Config:
