@@ -58,3 +58,10 @@ class PriceCalculationWithAddressRequest(BaseModel):
     current_time: datetime = Field(
         default_factory=datetime.now, description="Current time"
     )
+
+
+class RouteComparisonRequest(BaseModel):
+    origin_lat: float = Field(..., ge=-90, le=90, description="Origin latitude")
+    origin_lon: float = Field(..., ge=-180, le=180, description="Origin longitude")
+    dest_lat: float = Field(..., ge=-90, le=90, description="Destination latitude")
+    dest_lon: float = Field(..., ge=-180, le=180, description="Destination longitude")
