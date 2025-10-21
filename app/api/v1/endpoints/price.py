@@ -4,6 +4,7 @@ from app.api.v1.schemas.request import (
     PriceCalculationRequest,
     PriceCalculationWithAddressRequest,
     PriceCalculationWithRouteRequest,
+    RouteComparisonRequest,
     TrafficLevel,
 )
 from app.api.v1.schemas.response import PriceCalculationResponse
@@ -122,3 +123,34 @@ async def calculate_price_with_address(request: PriceCalculationWithAddressReque
         raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
         raise HTTPException(status_code=500, detail="Internal server error")
+
+
+@router.post("/compare-routes-with-address")
+async def compare_routes_with_address(origin_address: str, destination_address: str):
+    """Compare routes using address inputs"""
+    try:
+        origin = await map_service.geocode_address(origin_address)
+        destination = await map_service.geocode_address(destination_address)
+
+        comparison = await map_service.compare_routes(
+            origin_lat=origin.latitude,
+            origin_lon=origin.longitude,
+            dest_lat=destination.latitude,
+            dest_lon=destination.longitude,
+        )
+
+        comparison["origin"] = {
+            "address": origin.address,
+            "coordinates": {"lat": origin.latitude, "lon": origin.longitude},
+        }
+        comparison["destination"] = {
+            "address": destination.address,
+            "coordinates": {"lat": destination.latitude, "lon": destination.longitude},
+        }
+
+        return comparison
+
+    except ExternalAPIException as e:
+        raise HTTPException(status_code=503, detail=f"External API error: {str(e)}")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Comparison failed: {str(e)}")
