@@ -36,3 +36,23 @@ class PriceCalculationWithRouteRequest(BaseModel):
     current_time: datetime = Field(
         default_factory=datetime.now, description="Current time"
     )
+
+
+class PriceCalculationWithAddressRequest(BaseModel):
+    origin_address: str = Field(
+        ..., min_length=3, description="Origin address or place name"
+    )
+    destination_address: str = Field(
+        ..., min_length=3, description="Destination address or place name"
+    )
+    passengers_waiting: int = Field(
+        ..., ge=0, description="Number of waiting passengers"
+    )
+    drivers_available: int = Field(..., gt=0, description="Number of available drivers")
+    weather: Optional[WeatherType] = Field(
+        None, description="Weather (auto-detected if not provided)"
+    )
+    traffic: TrafficLevel = Field(..., description="Traffic level")
+    current_time: datetime = Field(
+        default_factory=datetime.now, description="Current time"
+    )
