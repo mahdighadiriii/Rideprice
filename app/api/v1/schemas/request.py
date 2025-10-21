@@ -17,3 +17,19 @@ class PriceCalculationRequest(BaseModel):
     current_time: datetime = Field(
         default_factory=datetime.now, description="Current time"
     )
+
+
+class PriceCalculationWithRouteRequest(BaseModel):
+    origin_lat: float = Field(..., ge=-90, le=90, description="Origin latitude")
+    origin_lon: float = Field(..., ge=-180, le=180, description="Origin longitude")
+    dest_lat: float = Field(..., ge=-90, le=90, description="Destination latitude")
+    dest_lon: float = Field(..., ge=-180, le=180, description="Destination longitude")
+    passengers_waiting: int = Field(
+        ..., ge=0, description="Number of waiting passengers"
+    )
+    drivers_available: int = Field(..., gt=0, description="Number of available drivers")
+    weather: WeatherType = Field(..., description="Weather condition")
+    traffic: TrafficLevel = Field(..., description="Traffic level")
+    current_time: datetime = Field(
+        default_factory=datetime.now, description="Current time"
+    )
