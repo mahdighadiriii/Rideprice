@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import Optional
 
 from pydantic import BaseModel, Field
 
@@ -28,7 +29,9 @@ class PriceCalculationWithRouteRequest(BaseModel):
         ..., ge=0, description="Number of waiting passengers"
     )
     drivers_available: int = Field(..., gt=0, description="Number of available drivers")
-    weather: WeatherType = Field(..., description="Weather condition")
+    weather: Optional[WeatherType] = Field(
+        None, description="Weather (auto-detected if not provided)"
+    )
     traffic: TrafficLevel = Field(..., description="Traffic level")
     current_time: datetime = Field(
         default_factory=datetime.now, description="Current time"
