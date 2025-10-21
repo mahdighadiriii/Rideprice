@@ -13,6 +13,7 @@ class Settings(BaseSettings):
 
     NESHAN_API_KEY: str = ""
     NESHAN_BASE_URL: str = "https://api.neshan.org/v4"
+    OPENWEATHER_API_KEY: str = ""
 
     class Config:
         env_file = ".env"
