@@ -2,6 +2,7 @@ from fastapi import APIRouter, HTTPException
 
 from app.api.v1.schemas.request import (
     PriceCalculationRequest,
+    PriceCalculationWithAddressRequest,
     PriceCalculationWithRouteRequest,
 )
 from app.api.v1.schemas.response import PriceCalculationResponse
@@ -54,6 +55,48 @@ async def calculate_price_with_route(request: PriceCalculationWithRouteRequest):
         else:
             weather_type = request.weather
 
+        result = price_service.calculate_price(
+            distance_km=route_info.distance_km,
+            time_minutes=route_info.time_minutes,
+            passengers=request.passengers_waiting,
+            drivers=request.drivers_available,
+            weather=weather_type.value,
+            traffic=request.traffic.value,
+            current_time=request.current_time,
+        )
+
+        return result
+
+    except ExternalAPIException as e:
+        raise HTTPException(status_code=503, detail=f"External API error: {str(e)}")
+    except CalculationException as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail="Internal server error")
+
+
+@router.post("/calculate-with-address", response_model=PriceCalculationResponse)
+async def calculate_price_with_address(request: PriceCalculationWithAddressRequest):
+    """Calculate ride price using addresses (easiest for users!)"""
+    try:
+        origin = await map_service.geocode_address(request.origin_address)
+        destination = await map_service.geocode_address(request.destination_address)
+
+        route_info = await map_service.get_route_info(
+            origin_lat=origin.latitude,
+            origin_lon=origin.longitude,
+            dest_lat=destination.latitude,
+            dest_lon=destination.longitude,
+        )
+
+        if request.weather is None:
+            weather_type = await weather_service.get_weather_type(
+                origin.latitude, origin.longitude
+            )
+        else:
+            weather_type = request.weather
+
+        # Step 4: Calculate price
         result = price_service.calculate_price(
             distance_km=route_info.distance_km,
             time_minutes=route_info.time_minutes,
