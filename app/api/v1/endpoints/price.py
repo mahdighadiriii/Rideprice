@@ -4,6 +4,7 @@ from app.api.v1.schemas.request import (
     PriceCalculationRequest,
     PriceCalculationWithAddressRequest,
     PriceCalculationWithRouteRequest,
+    TrafficLevel,
 )
 from app.api.v1.schemas.response import PriceCalculationResponse
 from app.core.exceptions import CalculationException, ExternalAPIException
@@ -77,38 +78,44 @@ async def calculate_price_with_route(request: PriceCalculationWithRouteRequest):
 
 @router.post("/calculate-with-address", response_model=PriceCalculationResponse)
 async def calculate_price_with_address(request: PriceCalculationWithAddressRequest):
-    """Calculate ride price using addresses (easiest for users!)"""
     try:
         origin = await map_service.geocode_address(request.origin_address)
         destination = await map_service.geocode_address(request.destination_address)
-
         route_info = await map_service.get_route_info(
             origin_lat=origin.latitude,
             origin_lon=origin.longitude,
             dest_lat=destination.latitude,
             dest_lon=destination.longitude,
         )
-
         if request.weather is None:
             weather_type = await weather_service.get_weather_type(
                 origin.latitude, origin.longitude
             )
         else:
             weather_type = request.weather
-
-        # Step 4: Calculate price
+        if request.traffic is None:
+            duration_minutes = route_info.time_minutes
+            distance_km = route_info.distance_km
+            if duration_minutes / distance_km < 1.5:
+                traffic_type = TrafficLevel.NORMAL
+            elif duration_minutes / distance_km < 2.0:
+                traffic_type = TrafficLevel.LIGHT
+            elif duration_minutes / distance_km < 2.5:
+                traffic_type = TrafficLevel.MODERATE
+            else:
+                traffic_type = TrafficLevel.HEAVY
+        else:
+            traffic_type = request.traffic
         result = price_service.calculate_price(
             distance_km=route_info.distance_km,
             time_minutes=route_info.time_minutes,
             passengers=request.passengers_waiting,
             drivers=request.drivers_available,
             weather=weather_type.value,
-            traffic=request.traffic.value,
+            traffic=traffic_type.value,
             current_time=request.current_time,
         )
-
         return result
-
     except ExternalAPIException as e:
         raise HTTPException(status_code=503, detail=f"External API error: {str(e)}")
     except CalculationException as e:
