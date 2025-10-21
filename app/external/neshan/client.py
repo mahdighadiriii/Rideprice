@@ -55,41 +55,37 @@ class NeshanClient(BaseHTTPClient):
             search_term = address
             if "tehran" not in address.lower() and "تهران" not in address:
                 search_term = f"{address}, Tehran, Iran"
-
             params = {
                 "q": search_term,
                 "format": "json",
                 "limit": 1,
                 "countrycodes": "ir",
             }
-
             headers = {
-                "User-Agent": "RidePrice-Service/1.0",
+                "User-Agent": "RidePriceService/1.0 (contact: your-email@example.com)",  # Update with your contact info
                 "Accept-Language": "fa,en",
             }
-
-            async with httpx.AsyncClient() as client:
+            async with httpx.AsyncClient(follow_redirects=True) as client:  # Enable redirect following
                 response = await client.get(
                     "https://nominatim.openstreetmap.org/search",
+                    params=params,
                     headers=headers,
                     timeout=10.0,
                 )
                 response.raise_for_status()
                 data = response.json()
-
-            if not data or len(data) == 0:
-                raise ExternalAPIException(f"Address not found: {address}")
-
-            result = data[0]
-
-            return NeshanGeocodingResult(
-                latitude=float(result["lat"]),
-                longitude=float(result["lon"]),
-                address=result.get("display_name", address),
-                title=result.get("name", ""),
-            )
-
-        except httpx.HTTPError as e:
-            raise ExternalAPIException(f"Geocoding error: {str(e)}")
+                if not data or len(data) == 0:
+                    raise ExternalAPIException(f"Address not found: {address}")
+                result = data[0]
+                return NeshanGeocodingResult(
+                    latitude=float(result["lat"]),
+                    longitude=float(result["lon"]),
+                    address=result.get("display_name", address),
+                    title=result.get("name", ""),
+                )
+        except httpx.HTTPStatusError as e:
+            raise ExternalAPIException(f"Geocoding HTTP error: {str(e)} - Status: {e.response.status_code}")
+        except httpx.RequestError as e:
+            raise ExternalAPIException(f"Geocoding request error: {str(e)}")
         except Exception as e:
             raise ExternalAPIException(f"Failed to geocode address: {str(e)}")
