@@ -1,5 +1,5 @@
 from app.external.neshan.client import NeshanClient
-from app.external.neshan.models import NeshanRouteResult
+from app.external.neshan.models import NeshanGeocodingResult, NeshanRouteResult
 
 
 class MapService:
@@ -13,3 +13,7 @@ class MapService:
         return await self.neshan_client.get_route(
             origin_lat, origin_lon, dest_lat, dest_lon
         )
+
+    async def geocode_address(self, address: str) -> NeshanGeocodingResult:
+        """Convert address to coordinates"""
+        return await self.neshan_client.geocode_address(address)
