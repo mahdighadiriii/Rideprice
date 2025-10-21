@@ -52,7 +52,9 @@ class PriceCalculationWithAddressRequest(BaseModel):
     weather: Optional[WeatherType] = Field(
         None, description="Weather (auto-detected if not provided)"
     )
-    traffic: TrafficLevel = Field(..., description="Traffic level")
+    traffic: Optional[TrafficLevel] = Field(
+        None, description="Traffic level (auto-detected if not provided)"
+    )
     current_time: datetime = Field(
         default_factory=datetime.now, description="Current time"
     )
