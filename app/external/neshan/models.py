@@ -17,3 +17,21 @@ class NeshanRouteResult(BaseModel):
     distance_km: float
     time_minutes: int
     original_response: Optional[dict] = None
+
+
+class NeshanGeocodingLocation(BaseModel):
+    x: float
+    y: float
+
+
+class NeshanGeocodingItem(BaseModel):
+    title: str
+    address: str
+    location: NeshanGeocodingLocation
+
+
+class NeshanGeocodingResult(BaseModel):
+    latitude: float
+    longitude: float
+    address: str
+    title: str
