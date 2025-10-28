@@ -1,0 +1,8 @@
+replicaCount: 2
+image:
+  name: rideprice-api
+  pullPolicy: Never
+service:
+  type: NodePort
+  port: 8000
+  nodePort: 30080

@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: rideprice-service
+spec:
+  type: {{ .Values.service.type }}
+  selector:
+    app: rideprice
+  ports:
+    - port: {{ .Values.service.port }}
+      targetPort: 8000
+      nodePort: {{ .Values.service.nodePort }}
