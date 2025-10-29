@@ -1,6 +1,6 @@
 replicaCount: 2
 image:
-  name: rideprice-api
+  name: rideprice-service:latest
   pullPolicy: Never
 service:
   type: LoadBalancer
